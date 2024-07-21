@@ -1,0 +1,15 @@
+scikit-image
+opencv-python
+imutils
+pytesseract
+colour-science
+scikit-learn
+langdetect
+lxml
+pycountry
+polyglot
+PyICU
+pycld2
+torch
+torchvision
+matplotlib
