@@ -13,3 +13,4 @@ pycld2
 torch
 torchvision
 matplotlib
+tabulate
