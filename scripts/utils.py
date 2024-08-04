@@ -14,7 +14,7 @@ class Utils:
         Parse the command line arguments.
         """
         parser = argparse.ArgumentParser(description="Run the project.")
-        parser.add_argument("-a", "--appName", required=True, help="second")
-        parser.add_argument("-b", "--bugId", required=True, help="first input image")
+        parser.add_argument("-app", "--appName", required=True, help="Name of the application.")
+        parser.add_argument("-bug", "--bugId", required=True, help="ID of the bug.")
 
         return vars(parser.parse_args())
