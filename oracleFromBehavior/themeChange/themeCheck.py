@@ -149,7 +149,6 @@ def find_trigger_reading_image(
     updated_screen_after_theme_change = None
     is_updated_screen_found = False
     updated_screen_index = None
-    updated_screen_xml = None
 
     # Variables to store the trigger screen and affected screens
     trigger_screen_list = []
@@ -220,7 +219,6 @@ def find_trigger_reading_image(
                 if match_ratio >= 0.90:
                     is_updated_screen_found = True
                     updated_screen_after_theme_change = result_screen_image
-                    updated_screen_xml = xml_path
                     updated_screen_index = current_screen_index
                     trigger_screen_list.append(updated_screen_after_theme_change)
                     screens_updated_after_theme_change[
