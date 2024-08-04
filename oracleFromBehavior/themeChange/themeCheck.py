@@ -144,22 +144,22 @@ def find_trigger_reading_image(
     Output: list of screen numbers where the trigger was clicked"""
 
     # State variables
-    is_theme_set = False
+    is_theme_changed = False
     is_post_theme_change_step = False
-    correctly_updated_screen = None
-    is_correctly_updated_screen_found = False
-    correctly_updated_screen_index = None
-    correctly_updated_screen_xml = None
+    updated_screen_after_theme_change = None
+    is_updated_screen_found = False
+    updated_screen_index = None
+    updated_screen_xml = None
 
     # Variables to store the trigger screen and affected screens
-    trigger_screens = []
-    text_in_trigger_screen = ""
+    trigger_screen_list = []
+    trigger_screen_text = ""
     screens_updated_after_theme_change = {}
-    image_xml_map = {}
+    screen_to_xml_map = {}
     bug_id = args["bugId"]
-    theme_change_success = {}
-    before_theme_image = ""
-    last_screen = ""
+    theme_change_success_map = {}
+    pre_theme_image_status = ""
+    previous_screen_image = ""
 
     # Iterate through each step
     for step in list_of_steps:
@@ -171,25 +171,25 @@ def find_trigger_reading_image(
         current_screen_index, tap_position, clicked_component_name = get_step_details(
             step
         )
-        triggered_component_image_path = os.path.join(bug_id, triggered_component_image)
+        clicked_component_image_path = os.path.join(bug_id, clicked_component_image)
         xml_path = find_xml_from_screenshot(
             start_screen_image, current_screen_index, args
         )
 
-        image_xml_map[result_screen_image] = xml_path
+        screen_to_xml_map[result_screen_image] = xml_path
 
         if (
-            is_theme_set
-            and is_correctly_updated_screen_found
-            and current_screen_index > correctly_updated_screen_index
+            is_theme_changed
+            and is_updated_screen_found
+            and current_screen_index > updated_screen_index
         ):
-            screens_updated_after_theme_change[correctly_updated_screen].append(
-                result_screen_image
-            )
+            screens_updated_after_theme_change[
+                updated_screen_after_theme_change
+            ].append(result_screen_image)
 
-        if not is_theme_set:
+        if not is_theme_changed:
             # Check if theme was set
-            is_theme_changed, is_post_theme_change_step = check_if_theme_set(
+            theme_change_detected, is_post_theme_change_step = check_if_theme_set(
                 clicked_component_image_path,
                 xml_path,
                 tap_position,
@@ -198,46 +198,48 @@ def find_trigger_reading_image(
             )
 
             # Process theme change
-            if is_theme_changed:
+            if theme_change_detected:
                 if not is_post_theme_change_step:
                     xml_path = find_xml_from_screenshot(
-                        last_screen, current_screen_index - 1, args
+                        previous_screen_image, current_screen_index - 1, args
                     )
 
-                is_theme_set = True
-                is_correctly_updated_screen_found = False
-                before_theme_image = imgUtil.is_image_light(
+                is_theme_changed = True
+                is_updated_screen_found = False
+                pre_theme_image_status = imgUtil.is_image_light(
                     os.path.join(bug_id, start_screen_image)
                 )
         else:
-            if is_correctly_updated_screen_found:
+            if is_post_theme_change_step:
                 text_in_current_screen = sorted(xmlUtilities.readTextInXml(xml_path))
                 sequence_matcher = difflib.SequenceMatcher(
-                    None, text_in_current_screen, text_in_trigger_screen
+                    None, text_in_current_screen, trigger_screen_text
                 )
                 match_ratio = sequence_matcher.ratio()
 
                 if match_ratio >= 0.90:
-                    is_correctly_updated_screen_found = True
-                    correctly_updated_screen = result_screen_image
-                    correctly_updated_screen_xml = xml_path
-                    correctly_updated_screen_index = current_screen_index
-                    trigger_screens.append(correctly_updated_screen)
-                    screens_updated_after_theme_change[correctly_updated_screen] = []
-                    after_theme_image = imgUtil.is_image_light(
+                    is_updated_screen_found = True
+                    updated_screen_after_theme_change = result_screen_image
+                    updated_screen_xml = xml_path
+                    updated_screen_index = current_screen_index
+                    trigger_screen_list.append(updated_screen_after_theme_change)
+                    screens_updated_after_theme_change[
+                        updated_screen_after_theme_change
+                    ] = []
+                    post_theme_image_status = imgUtil.is_image_light(
                         os.path.join(bug_id, result_screen_image)
                     )
-                    theme_change_success[correctly_updated_screen] = (
-                        before_theme_image != after_theme_image
+                    theme_change_success_map[updated_screen_after_theme_change] = (
+                        pre_theme_image_status != post_theme_image_status
                     )
 
-        last_screen = start_screen_image
+        previous_screen_image = start_screen_image
 
     return (
-        trigger_screens,
+        trigger_screen_list,
         screens_updated_after_theme_change,
-        image_xml_map,
-        theme_change_success,
+        screen_to_xml_map,
+        theme_change_success_map,
     )
 
 
@@ -245,6 +247,7 @@ def check_if_keyboard_visible(imageName):
     img = cv2.imread(imageName)
     croppedA = imgUtil.crop_keyboard(img)
     return labelPredictor.has_keyboard(croppedA)
+
 
 def main():
 
@@ -272,11 +275,6 @@ def main():
 
     if len(triggerList) >= 1:
         print("Theme change detected")
-
-        # if not themeChangeSuccess:
-        #     print("Theme change was not successful")
-        # else:
-        #     print("Theme changed successfully")
     else:
         print("Theme change not detected")
         return
