@@ -111,13 +111,13 @@ def find_xml_from_screenshot(imagename, stepNum, args):
 
     xmlName = ""
     if tracePlayerGenerated:
-        # xmlName = imagename.split(".User-Trace")[0]
-        # xmlName += "-" + args["bugId"] + "-12-User-Trace-" + str(stepNum) + ".xml"
+        xmlName = imagename.split(".User-Trace")[0]
+        xmlName += "-" + args["bugId"] + "-12-User-Trace-" + str(stepNum) + ".xml"
 
         # Work for Canvas specifically
         # Input: setting-light.canvas.png
         # Output: setting-light.canvas.xml
-        xmlName = imagename + ".xml"
+        # xmlName = imagename + ".xml"
     else:
         xmlName = imagename.split("screen")[0]
         xmlName += "ui-dump.xml"
@@ -126,7 +126,6 @@ def find_xml_from_screenshot(imagename, stepNum, args):
 
 
 def get_step_details(step):
-
     screen_index = step["sequenceStep"]
     tapPosition = step["textEntry"].split(" ")
     if "dynGuiComponent" in step:
@@ -248,7 +247,6 @@ def check_if_keyboard_visible(imageName):
 
 
 def main():
-
     args = load_arguments()
     bugId = args["bugId"]
     screen_count_map = {}
@@ -344,15 +342,7 @@ def is_text_displayed(bugId, affected_image, xmlPath):
 
     diff = set(txt_from_xml) - set(txt_from_img)
     bad_frac = len(diff) / len(txt_from_xml)
-    # print(diff)
-    # print(affected_image)
-    # seq_mat.set_seqs(txt_from_img, txt_from_xml)
-    # print(txt_from_img)
-    # print(txt_from_xml)
-    # print(txt_from_xml)
-    # print(txt_from_img)
-    # match_ratio = seq_mat.ratio()
-    # if match_ratio >= 0.50:
+
     if bad_frac <= 0.5:
         print("Most text shows in ", affected_image)
     else:
