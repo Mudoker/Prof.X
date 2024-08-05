@@ -14,3 +14,4 @@ torch
 torchvision
 matplotlib
 tabulate
+uiautomator2
