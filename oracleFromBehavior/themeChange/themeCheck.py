@@ -113,16 +113,12 @@ def find_xml_from_screenshot(imagename, stepNum, args):
     if tracePlayerGenerated:
         xmlName = imagename.split(".User-Trace")[0]
         xmlName += "-" + args["bugId"] + "-12-User-Trace-" + str(stepNum) + ".xml"
-
-        # Work for Canvas specifically
-        # Input: setting-light.canvas.png
-        # Output: setting-light.canvas.xml
         # xmlName = imagename + ".xml"
     else:
         xmlName = imagename.split("screen")[0]
         xmlName += "ui-dump.xml"
 
-    return os.path.join(args["bugId"], os.path.join("xmls", xmlName))
+    return os.path.join("./evalApps/",args["bugId"], os.path.join("xmls", xmlName))
 
 
 def get_step_details(step):
@@ -135,6 +131,90 @@ def get_step_details(step):
 
     return screen_index, tapPosition, clicked_comp_name
 
+
+# def find_trigger_reading_image(listOfSteps, screen_count_map, listOfTriggerWords, args):
+#     """input: steps list from execution.json
+#     output: list of screen number where trigger clicked"""
+#     screen_background = "light"
+#     triggerList = []
+#     theme_set = False
+#     correct_screen_found = False
+#     correct_theme_index = None
+#     text_in_trigger_screen = ""
+#     correct_screen = None
+#     correct_affected_image_map = {}
+#     image_xml_map = {}
+#     bugId = args["bugId"]
+#     correct_xml = None
+#     themeChangeSuccess = {}
+#     before_theme = ""
+#     # themeChanged = False
+#     oneStep = False
+#     # nextScreen = False
+#     lastScreen = ""
+#     for step in listOfSteps:
+
+#         if theme_set:
+#             oneStep = True
+
+#         start_screen = step["screenshot"]
+#         clicked_screen = start_screen.replace("augmented", "gui")
+#         result_screen = start_screen.replace("_augmented", "")
+
+#         screen_index, tapPos, clicked_comp_name = get_step_details(step)
+
+#         clicked_Image = os.path.join("./evalApps/", bugId, clicked_screen)
+#         xmlPath = find_xml_from_screenshot(start_screen, screen_index, args)
+
+#         image_xml_map[result_screen] = xmlPath
+
+#         if theme_set and correct_screen_found and screen_index > correct_theme_index:
+#             correct_affected_image_map[correct_screen].append(result_screen)
+
+#         if not theme_set:
+#             themeChanged, oneStep = check_if_theme_set(
+#                 clicked_Image, xmlPath, tapPos, clicked_comp_name, listOfTriggerWords
+#             )
+#         if themeChanged and not theme_set:
+#             # print("YUP", xmlPath)
+#             if not oneStep:
+#                 xmlPath = find_xml_from_screenshot(lastScreen, screen_index - 1, args)
+#             text_in_trigger_screen = sorted(xmlUtilities.readTextInXml(xmlPath))
+#             # print(xmlPath)
+#             # print(text_in_trigger_screen)
+#             theme_set = True
+#             correct_screen_found = False
+#             before_theme = imgUtil.is_image_light(
+#                 os.path.join("./evalApps/", bugId, start_screen)
+#             )
+#         lastScreen = start_screen
+#         if theme_set and not correct_screen_found and oneStep:
+#             # print("HEREHERE")
+#             text_in_screen = sorted(xmlUtilities.readTextInXml(xmlPath))
+#             # this detects the screen before theme change completed, assume the theme here is correct
+#             seq_mat = difflib.SequenceMatcher()
+#             seq_mat.set_seqs(text_in_screen, text_in_trigger_screen)
+#             match_ratio = seq_mat.ratio()
+#             # print(match_ratio, xmlPath)
+#             # print(text_in_screen)
+#             if match_ratio >= 0.90:
+#                 correct_screen_found = True
+#                 correct_screen = result_screen
+#                 correct_xml = xmlPath
+#                 correct_theme_index = screen_index
+#                 triggerList.append(correct_screen)
+#                 correct_affected_image_map[correct_screen] = []
+#                 after_theme = imgUtil.is_image_light(
+#                     os.path.join("./evalApps/", bugId, result_screen)
+#                 )
+#                 if before_theme != after_theme:
+#                     themeChangeSuccess[correct_screen] = True
+#                 else:
+#                     themeChangeSuccess[correct_screen] = False
+#                 # continue
+#         # print(triggerList, correct_affected_image_map)
+
+#     return triggerList, correct_affected_image_map, image_xml_map, themeChangeSuccess
 
 def find_trigger_reading_image(
     list_of_steps, screen_count_map, list_of_trigger_words, args
@@ -169,7 +249,7 @@ def find_trigger_reading_image(
         current_screen_index, tap_position, clicked_component_name = get_step_details(
             step
         )
-        clicked_component_image_path = os.path.join(bug_id, clicked_component_image)
+        clicked_component_image_path = os.path.join("./evalApps/",bug_id, clicked_component_image)
         xml_path = find_xml_from_screenshot(
             start_screen_image, current_screen_index, args
         )
@@ -205,7 +285,7 @@ def find_trigger_reading_image(
                 is_theme_changed = True
                 is_updated_screen_found = False
                 pre_theme_image_status = imgUtil.is_image_light(
-                    os.path.join(bug_id, start_screen_image)
+                    os.path.join("./evalApps/",bug_id, start_screen_image)
                 )
         else:
             if is_post_theme_change_step:
@@ -224,7 +304,7 @@ def find_trigger_reading_image(
                         updated_screen_after_theme_change
                     ] = []
                     post_theme_image_status = imgUtil.is_image_light(
-                        os.path.join(bug_id, result_screen_image)
+                        os.path.join("./evalApps/",bug_id, result_screen_image)
                     )
                     theme_change_success_map[updated_screen_after_theme_change] = (
                         pre_theme_image_status != post_theme_image_status
@@ -251,7 +331,7 @@ def main():
     bugId = args["bugId"]
     screen_count_map = {}
 
-    data = read_json(os.path.join(bugId, "Execution-12.json"))
+    data = read_json(os.path.join("./evalApps/", bugId, "Execution-12.json"))
     listOfTriggerWords = create_trigger_list()
 
     for line in data:
@@ -261,15 +341,14 @@ def main():
                 "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  ORACLE FOR THEME CHANGE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
             )
             (
-                triggerList,
+                trigger_screen_list,
                 correct_affected_image_map,
                 image_xml_map,
                 themeChangeSuccess,
             ) = find_trigger_reading_image(
                 listOfSteps, screen_count_map, listOfTriggerWords, args
             )
-
-    if len(triggerList) >= 1:
+    if len(trigger_screen_list) >= 1:
         print("Theme change detected")
     else:
         print("Theme change not detected")
@@ -292,16 +371,16 @@ def main():
     # check if theme of all screen match
     for trigger in triggerList:
         all_affected_images = correct_affected_image_map[trigger]
-        hasKeyboard = check_if_keyboard_visible(os.path.join(bugId, trigger))
+        hasKeyboard = check_if_keyboard_visible(os.path.join("./evalApps/",bugId, trigger))
         print(trigger, bugId)
-        lab1 = imgUtil.get_lab_val(os.path.join(bugId, trigger), hasKeyboard, None)
+        lab1 = imgUtil.get_lab_val(os.path.join("./evalApps/",bugId, trigger), hasKeyboard, None)
         for affected_image in all_affected_images:
-            hasKeyboard = check_if_keyboard_visible(os.path.join(bugId, affected_image))
+            hasKeyboard = check_if_keyboard_visible(os.path.join("./evalApps/",bugId, affected_image))
             xmlPath = image_xml_map[affected_image]
             bounds = getFocusedElement(xmlPath)
 
             lab2 = imgUtil.get_lab_val(
-                os.path.join(bugId, affected_image), hasKeyboard, bounds
+                os.path.join("./evalApps/",bugId, affected_image), hasKeyboard, bounds
             )
             is_theme_matching(lab1, lab2, trigger, affected_image)
 
