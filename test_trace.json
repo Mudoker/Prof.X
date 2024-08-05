@@ -1,0 +1,64 @@
+{
+    "date": "Aug 05, 2024, 12:49:43 PM",
+    "deviceDimensions": "1344x2992",
+    "executionType": "User-Trace-",
+    "executionNum": 12,
+    "crash": false,
+    "deviceName": "emulator-5554",
+    "elapsedTime": 10.889624,
+    "orientation": "PORTRAIT",
+    "mainActivity": "com.instructure.student.activity.LoginLandingPageActivity",
+    "androidVersion": "15",
+    "steps": [
+        {
+            "action": "click",
+            "sequenceStep": 1,
+            "screenshot": "screenshot_20240805_124941.png",
+            "textEntry": "Clicked on element",
+            "areaEdit": 0,
+            "hashStep": "NO_HASH",
+            "areaView": 0,
+            "areaList": 0,
+            "areaSelect": 0,
+            "initialX": 0,
+            "initialY": 0,
+            "finalX": 0,
+            "finalY": 0,
+            "useCaseTranType": 0,
+            "network": false,
+            "acellerometer": false,
+            "magentometer": false,
+            "temperature": false,
+            "gps": false,
+            "screen": {
+                "activity": "com.instructure.student.activity.LoginLandingPageActivity",
+                "window": "NO_WINDOW",
+                "dynGuiComponents": [
+                    {
+                        "activity": "com.instructure.student.activity.LoginLandingPageActivity",
+                        "name": "null",
+                        "idXml": "com.instructure.candroid:id/findMySchool",
+                        "positionX": 144,
+                        "positionY": 2476,
+                        "height": 144,
+                        "width": 1056,
+                        "checkable": false,
+                        "checked": false,
+                        "clickable": true,
+                        "enabled": true,
+                        "focusable": true,
+                        "focused": false,
+                        "longClickable": false,
+                        "scrollable": false,
+                        "selected": false,
+                        "password": false,
+                        "idText": "Find my school",
+                        "offset": 0,
+                        "drawTime": 0.0
+                    }
+                ]
+            },
+            "timestamp": "2024-08-05T12:49:43.615574"
+        }
+    ]
+}
